@@ -10,15 +10,16 @@
 
 namespace nystudio107\similar\services;
 
-use craft\base\Element;
-use craft\base\ElementInterface;
-
 use Craft;
 use craft\base\Component;
+use craft\base\Element;
+use craft\base\ElementInterface;
+use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
-use craft\helpers\ArrayHelper;
+use craft\events\CancelableEvent;
+
 use yii\base\Exception;
 
 /**
@@ -28,6 +29,14 @@ use yii\base\Exception;
  */
 class Similar extends Component
 {
+    // Public Properties
+    // =========================================================================
+
+    /**
+     * @var string The previous order in the query
+     */
+    public $preOrder;
+
     // Public Methods
     // =========================================================================
 
@@ -47,7 +56,7 @@ class Similar extends Component
             throw new Exception("Required parameter `context` was not supplied to `craft.similar.find`.");
         }
 
-        /** @var ElementInterface $element */
+        /** @var Element $element */
         $element = $data['element'];
         $context = $data['context'];
         $criteria = isset($data['criteria']) ? $data['criteria'] : [];
@@ -55,19 +64,21 @@ class Similar extends Component
             /** @var ElementQueryInterface $criteria */
             $criteria = $criteria->toArray();
         }
-        $reflector = new \ReflectionClass($element);
-        $elementName = $reflector->getShortName();
 
-        $modelName = 'nystudio107\similar\models\Similar'.$elementName;
+        // Get an ElementQuery for this Element
+        $elementClass = is_object($element) ? get_class($element) : $element;
         /** @var EntryQuery $query */
-        $query = $this->getElementQuery($modelName, $criteria);
+        $query = $this->getElementQuery($elementClass, $criteria);
 
+        // If the $query is null, just return an empty Entry
         if (!$query) { // no results
             return new Entry();
         }
 
-        $preOrder = $query->orderBy;
+        // Stash any orderBy directives from the $query for our anonymous function
+        $this->preOrder = $query->orderBy;
 
+        // Extract the $tagIds from the $context
         if (is_array($context)) {
             $tagIds = $context;
         } else {
@@ -75,49 +86,36 @@ class Similar extends Component
             $tagIds = $context->ids();
         }
 
-        /**
-         * @TODO: this works, but it's gross. Ideally we could do all of the sorting
-         *      and grouping in the ElementQuery as per the original code:
-         *      https://github.com/aelvan/Similar-Craft/blob/master/similar/services/SimilarService.php#L56
-         *      If we use asArray(true) we can prevent it from trying to create the elements
-         *      with fields that don't exist ('count'):
-         *      https://stackoverflow.com/questions/24389765/how-to-count-and-group-by-in-yii2
-         *      but the grouping is still wrong. Also apparently orderBy() isn't passed through to the
-         *      query object, as per Brandon ¯\_(ツ)_/¯
-         */
-        //$query->addSelect(['COUNT(*) as count']);
-        //$query->orderBy('count DESC, ' . str_replace('`', '', $preOrder));
-        //$query->asArray(true);
+        // We need to modify the actual craft\db\Query after the ElementQuery has been prepared
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function(CancelableEvent $event) {
+            /** @var ElementQuery $query */
+            $query = $event->sender;
+            // Add in the `count` param so we know how many were fetched
+            $query->query->addSelect(['COUNT(*) as count']);
+            $query->query->orderBy('count DESC, ' . str_replace('`', '', $this->preOrder));
+            $query->query->groupBy('{{%relations}}.sourceId');
+            $event->isValid = true;
+        });
+        // Return the data as an array, and only fetch the `id` and `siteId`
+        $query->asArray(true);
+        $query->select(['elements.id', 'elements_sites.siteId']);
         $query->andWhere('elements.id != :id', ['id' => $element->id]);
         $query->andWhere(['in', '{{%relations}}.targetId', $tagIds]);
         $query->leftJoin('{{%relations}}', 'elements.id={{%relations}}.sourceId');
-        $query->groupBy('{{%relations}}.sourceId');
         $results = $query->all();
 
-        // Group the resulting Elements by id
-        $results = ArrayHelper::index(
-            $results,
-            null,
-            [function ($model) {
-                return $model->id;
-            }]
-        );
-        // Convert the array of arrays to an array of models with a `count` of the number of models
+        // Fetch the elements based on the returned `id` and `siteId`
+        $elements = Craft::$app->getElements();
         $models = [];
-        foreach ($results as $result) {
-            /** @var Element $model */
-            $model = $result[0];
-            $config = $model->toArray();
-            $config['count'] = count($result);
-            $models[] = new $modelName($config);
+        foreach ($results as $config) {
+            $model = $elements->getElementById($config['id'], $elementClass, $config['siteId']);
+            if ($model) {
+                // The `count` property is added dynamically by our CountBehavior behavior
+                /** @noinspection PhpUndefinedFieldInspection */
+                $model->count = $config['count'];
+                $models[] = $model;
+            }
         }
-        // Sort the array of models by the number of elements
-        ArrayHelper::multisort($models,
-            function($model) {
-                return $model->count;
-            },
-            SORT_DESC
-        );
 
         return $models;
     }
