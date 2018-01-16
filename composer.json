@@ -8,6 +8,8 @@
         "cms",
         "craftcms",
         "craft-plugin",
+        "elements",
+        "relations",
         "similar"
     ],
     "support": {

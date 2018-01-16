@@ -8,16 +8,16 @@
  * @copyright Copyright (c) 2018 nystudio107.com
  */
 
-namespace nystudio107\similar\models;
+namespace nystudio107\similar\behaviors;
 
-use craft\elements\Tag;
+use yii\base\Behavior;
 
 /**
  * @author    nystudio107.com
  * @package   Similar
  * @since     1.0.0
  */
-class SimilarTag extends Tag
+class CountBehavior extends Behavior
 {
     // Public Properties
     // =========================================================================
@@ -30,14 +30,4 @@ class SimilarTag extends Tag
     // Public Methods
     // =========================================================================
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return array_merge(parent::rules(), [
-            ['count', 'integer'],
-            ['count', 'default', 'value' => 0],
-        ]);
-    }
 }
