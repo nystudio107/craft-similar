@@ -10,12 +10,16 @@
 
 namespace nystudio107\similar;
 
+use craft\base\Element;
+use nystudio107\similar\behaviors\CountBehavior;
 use nystudio107\similar\services\Similar as SimilarService;
 use nystudio107\similar\variables\SimilarVariable;
 
 use Craft;
 use craft\base\Plugin;
+use craft\elements\db\ElementQuery;
 use craft\events\PluginEvent;
+use craft\events\PopulateElementEvent;
 use craft\services\Plugins;
 use craft\web\twig\variables\CraftVariable;
 
@@ -60,6 +64,15 @@ class Similar extends Plugin
                 $variable->set('similar', SimilarVariable::class);
             }
         );
+
+        Event::on(
+            ElementQuery::class,
+            ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
+            function(PopulateElementEvent $event) {
+                $element = $event->element;
+                /** @var Element $element */
+                $element->attachBehavior('myCountBehavior', CountBehavior::class);
+        });
 
         Event::on(
             Plugins::class,
