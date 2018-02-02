@@ -13,7 +13,7 @@
         "similar"
     ],
     "support": {
-        "docs": "https://github.com/nystudio107/craft-similar/blob/master/README.md",
+        "docs": "https://github.com/nystudio107/craft-similar/blob/v1/README.md",
         "issues": "https://github.com/nystudio107/craft-similar/issues"
     },
     "license": "MIT",
@@ -37,7 +37,7 @@
         "schemaVersion": "1.0.0",
         "hasCpSettings": false,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/nystudio107/craft-similar/master/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/nystudio107/craft-similar/v1/CHANGELOG.md",
         "components": {
             "similar": "nystudio107\\similar\\services\\Similar"
         },
