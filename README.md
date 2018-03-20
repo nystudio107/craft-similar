@@ -1,3 +1,5 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/quality-score.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v1) [![Code Coverage](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/coverage.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v1) [![Build Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/build.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/build-status/v1) [![Code Intelligence Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/code-intelligence.svg?b=v1)](https://scrutinizer-ci.com/code-intelligence)
+
 # Similar plugin for Craft CMS 3.x
 
 Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.
@@ -23,6 +25,8 @@ To install the plugin, follow these instructions.
         composer require nystudio107/craft-similar
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Similar.
+
+You can also install Similar via the **Plugin Store** in the Craft AdminCP.
 
 ## Similar Overview
 
