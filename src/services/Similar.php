@@ -2,7 +2,8 @@
 /**
  * Similar plugin for Craft CMS 3.x
  *
- * Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.
+ * Similar for Craft lets you find elements, Entries, Categories, Commerce
+ * Products, etc, that are similar, based on... other related elements.
  *
  * @link      https://nystudio107.com/
  * @copyright Copyright (c) 2018 nystudio107.com
@@ -87,13 +88,14 @@ class Similar extends Component
         }
 
         // We need to modify the actual craft\db\Query after the ElementQuery has been prepared
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function(CancelableEvent $event) {
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function (CancelableEvent $event) {
             /** @var ElementQuery $query */
             $query = $event->sender;
             // Add in the `count` param so we know how many were fetched
             $query->query->addSelect(['COUNT(*) as count']);
-            $query->query->orderBy('count DESC, ' . str_replace('`', '', $this->preOrder));
+            $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
             $query->query->groupBy('{{%relations}}.sourceId');
+            $query->subQuery->groupBy('{{%elements}}.id');
             $event->isValid = true;
         });
         // Return the data as an array, and only fetch the `id` and `siteId`
