@@ -2,7 +2,8 @@
 /**
  * Similar plugin for Craft CMS 3.x
  *
- * Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.
+ * Similar for Craft lets you find elements, Entries, Categories, Commerce
+ * Products, etc, that are similar, based on... other related elements.
  *
  * @link      https://nystudio107.com/
  * @copyright Copyright (c) 2018 nystudio107.com
@@ -49,24 +50,24 @@ class Similar extends Component
     public function find($data)
     {
         if (!isset($data['element'])) {
-            throw new Exception("Required parameter `element` was not supplied to `craft.similar.find`.");
+            throw new Exception('Required parameter `element` was not supplied to `craft.similar.find`.');
         }
 
         if (!isset($data['context'])) {
-            throw new Exception("Required parameter `context` was not supplied to `craft.similar.find`.");
+            throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
 
         /** @var Element $element */
         $element = $data['element'];
         $context = $data['context'];
-        $criteria = isset($data['criteria']) ? $data['criteria'] : [];
-        if (is_object($criteria)) {
+        $criteria = $data['criteria'] ?? [];
+        if (\is_object($criteria)) {
             /** @var ElementQueryInterface $criteria */
             $criteria = $criteria->toArray();
         }
 
         // Get an ElementQuery for this Element
-        $elementClass = is_object($element) ? get_class($element) : $element;
+        $elementClass = \is_object($element) ? \get_class($element) : $element;
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
 
@@ -79,7 +80,7 @@ class Similar extends Component
         $this->preOrder = $query->orderBy;
 
         // Extract the $tagIds from the $context
-        if (is_array($context)) {
+        if (\is_array($context)) {
             $tagIds = $context;
         } else {
             /** @var ElementQueryInterface $context */
@@ -87,15 +88,7 @@ class Similar extends Component
         }
 
         // We need to modify the actual craft\db\Query after the ElementQuery has been prepared
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function(CancelableEvent $event) {
-            /** @var ElementQuery $query */
-            $query = $event->sender;
-            // Add in the `count` param so we know how many were fetched
-            $query->query->addSelect(['COUNT(*) as count']);
-            $query->query->orderBy('count DESC, ' . str_replace('`', '', $this->preOrder));
-            $query->query->groupBy('{{%relations}}.sourceId');
-            $event->isValid = true;
-        });
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, [$this, 'eventAfterPrepareHandler']);
         // Return the data as an array, and only fetch the `id` and `siteId`
         $query->asArray(true);
         $query->select(['elements.id', 'elements_sites.siteId']);
@@ -124,6 +117,21 @@ class Similar extends Component
     // =========================================================================
 
     /**
+     * @param CancelableEvent $event
+     */
+    protected function eventAfterPrepareHandler(CancelableEvent $event)
+    {
+        /** @var ElementQuery $query */
+        $query = $event->sender;
+        // Add in the `count` param so we know how many were fetched
+        $query->query->addSelect(['COUNT(*) as count']);
+        $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
+        $query->query->groupBy('{{%relations}}.sourceId');
+        $query->subQuery->groupBy('{{%elements}}.id');
+        $event->isValid = true;
+    }
+
+    /**
      * Returns the element query based on $elementType and $criteria
      *
      * @var string|ElementInterface $elementType
@@ -139,5 +147,4 @@ class Similar extends Component
 
         return $query;
     }
-
 }
