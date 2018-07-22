@@ -127,7 +127,7 @@ class Similar extends Component
         $query->query->addSelect(['COUNT(*) as count']);
         $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
         $query->query->groupBy('{{%relations}}.sourceId');
-        $query->subQuery->groupBy('{{%elements}}.id');
+        $query->subQuery->groupBy('elements.id');
         $event->isValid = true;
     }
 
