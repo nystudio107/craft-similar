@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.2 - 2018-07-21
+### Changed
+* Fixed an issue that errantly prefixed the sub-query with the table name
+
 ## 1.0.1 - 2018-07-21
 ### Changed
 * Added grouping to the sub-query to ensure that it returns the correct number of results
