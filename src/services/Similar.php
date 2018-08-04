@@ -134,7 +134,7 @@ class Similar extends Component
 
         $query->query->andWhere(['in', '{{%relations}}.targetId', $this->targetElements]);
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
-        $query->query->limit($this->limit = $query->limit); // or whatever limit is set
+        $query->query->limit($this->limit); // or whatever limit is set
 
         $query->subQuery->groupBy('elements.id');
         $event->isValid = true;
