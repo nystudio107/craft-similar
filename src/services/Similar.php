@@ -38,6 +38,9 @@ class Similar extends Component
      */
     public $preOrder;
 
+    public $limit;
+
+    public $targetElements;
     // Public Methods
     // =========================================================================
 
@@ -78,7 +81,7 @@ class Similar extends Component
 
         // Stash any orderBy directives from the $query for our anonymous function
         $this->preOrder = $query->orderBy;
-
+        $this->limit = $query->limit;
         // Extract the $tagIds from the $context
         if (\is_array($context)) {
             $tagIds = $context;
@@ -86,6 +89,7 @@ class Similar extends Component
             /** @var ElementQueryInterface $context */
             $tagIds = $context->ids();
         }
+        $this->targetElements = $tagIds;
 
         // We need to modify the actual craft\db\Query after the ElementQuery has been prepared
         $query->on(ElementQuery::EVENT_AFTER_PREPARE, [$this, 'eventAfterPrepareHandler']);
@@ -127,6 +131,11 @@ class Similar extends Component
         $query->query->addSelect(['COUNT(*) as count']);
         $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
         $query->query->groupBy('{{%relations}}.sourceId');
+
+        $query->query->andWhere(['in', '{{%relations}}.targetId', $this->targetElements]);
+        $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
+        $query->query->limit($this->limit); // or whatever limit is set
+
         $query->subQuery->groupBy('elements.id');
         $event->isValid = true;
     }

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.3 - 2018-08-04
+### Changed
+* Fixed a regression of the returned query results
+
 ## 1.0.2 - 2018-07-21
 ### Changed
 * Fixed an issue that errantly prefixed the sub-query with the table name
