@@ -131,6 +131,7 @@ class Similar extends Component
         $query->query->addSelect(['COUNT(*) as count']);
         $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
         $query->query->groupBy('{{%relations}}.sourceId');
+        $query->query->groupBy('elements.id');
 
         $query->query->andWhere(['in', '{{%relations}}.targetId', $this->targetElements]);
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
