@@ -105,12 +105,14 @@ class Similar extends Component
         $elements = Craft::$app->getElements();
         $models = [];
         foreach ($results as $config) {
-            $model = $elements->getElementById($config['id'], $elementClass, $config['siteId']);
-            if ($model) {
-                // The `count` property is added dynamically by our CountBehavior behavior
-                /** @noinspection PhpUndefinedFieldInspection */
-                $model->count = $config['count'];
-                $models[] = $model;
+            if($config['id'] && $config['siteId']) {
+                $model = $elements->getElementById($config['id'], $elementClass, $config['siteId']);
+                if ($model) {
+                    // The `count` property is added dynamically by our CountBehavior behavior
+                    /** @noinspection PhpUndefinedFieldInspection */
+                    $model->count = $config['count'];
+                    $models[] = $model;
+                }
             }
         }
 
