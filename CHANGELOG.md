@@ -1,6 +1,9 @@
 # Similar Changelog
 
-All notable changes to this project will be documented in this file.
+## 1.0.4 - 2018-10-08
+### Changed
+* Only try to fetch elements if SQL query returns an `id`
+* Update GROUP BY clause in SELECT queries to ensure they are compatible with `sql_mode=only_full_group_by`
 
 ## 1.0.3 - 2018-08-04
 ### Changed
