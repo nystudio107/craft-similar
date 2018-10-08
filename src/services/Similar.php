@@ -130,13 +130,13 @@ class Similar extends Component
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
         $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
-        $query->query->groupBy('{{%relations}}.sourceId');
+        $query->query->groupBy(['{{%relations}}.sourceId', 'elements.id']);
 
         $query->query->andWhere(['in', '{{%relations}}.targetId', $this->targetElements]);
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
         $query->query->limit($this->limit); // or whatever limit is set
 
-        $query->subQuery->groupBy('elements.id');
+        $query->subQuery->groupBy(['structureelements.lft', 'elements.id']);
         $event->isValid = true;
     }
 
