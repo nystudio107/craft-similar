@@ -138,7 +138,10 @@ class Similar extends Component
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
         $query->query->limit($this->limit); // or whatever limit is set
 
-        $query->subQuery->groupBy(['structureelements.lft', 'elements.id']);
+        $query->subQuery->groupBy('elements.id');
+        if($query->elementType == 'craft\elements\Entry') {
+            $query->subQuery->addGroupBy('structureelements.lft');
+        }
         $event->isValid = true;
     }
 
