@@ -140,7 +140,7 @@ class Similar extends Component
 
         $query->subQuery->groupBy('elements.id');
         if($query->elementType == 'craft\elements\Entry') {
-            $query->subQuery->addGroupBy('structureelements.lft');
+            $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
         $event->isValid = true;
     }
