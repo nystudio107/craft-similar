@@ -1,5 +1,9 @@
 # Similar Changelog
 
+## 1.0.5 - 2019-01-05
+### Changed
+* Fix SQL error: Unknown column `structureelements.lft` in 'group statement for Products
+
 ## 1.0.4 - 2018-10-08
 ### Changed
 * Only try to fetch elements if SQL query returns an `id`
