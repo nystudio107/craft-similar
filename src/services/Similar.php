@@ -41,6 +41,7 @@ class Similar extends Component
     public $limit;
 
     public $targetElements;
+
     // Public Methods
     // =========================================================================
 
@@ -105,7 +106,7 @@ class Similar extends Component
         $elements = Craft::$app->getElements();
         $models = [];
         foreach ($results as $config) {
-            if($config['id'] && $config['siteId']) {
+            if ($config['id'] && $config['siteId']) {
                 $model = $elements->getElementById($config['id'], $elementClass, $config['siteId']);
                 if ($model) {
                     // The `count` property is added dynamically by our CountBehavior behavior
@@ -139,8 +140,8 @@ class Similar extends Component
         $query->query->limit($this->limit); // or whatever limit is set
 
         $query->subQuery->groupBy('elements.id');
-        if($query->elementType == 'craft\elements\Entry') {
-            $query->subQuery->addGroupBy('structureelements.lft');
+        if ($query->elementType === 'craft\elements\Entry') {
+            $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
         $event->isValid = true;
     }
