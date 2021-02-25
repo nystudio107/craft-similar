@@ -1,5 +1,9 @@
 # Similar Changelog
 
+## Unreleased
+### Changed
+* Similar plugin now requires at least Craft CMS 3.2.0.
+
 ## 1.0.6 - 2019-04-20
 ### Changed
 * Add `structureelements.structureId` to `GROUP BY` clause
