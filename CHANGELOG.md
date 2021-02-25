@@ -2,7 +2,11 @@
 
 ## Unreleased
 ### Changed
+* Similar elements are now searched in the source element site only by default.
 * Similar plugin now requires at least Craft CMS 3.2.0.
+
+### Fixed
+* Fix an SQL error related to stricter GROUP BY rules. (https://github.com/nystudio107/craft-similar/issues/19)
 
 ## 1.0.6 - 2019-04-20
 ### Changed

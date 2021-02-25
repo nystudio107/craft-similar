@@ -15,6 +15,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
+use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
@@ -97,9 +98,15 @@ class Similar extends Component
         // Return the data as an array, and only fetch the `id` and `siteId`
         $query->asArray(true);
         $query->select(['elements.id', 'elements_sites.siteId']);
-        $query->andWhere('elements.id != :id', ['id' => $element->id]);
-        $query->andWhere(['in', '{{%relations}}.targetId', $tagIds]);
-        $query->leftJoin('{{%relations}}', 'elements.id={{%relations}}.sourceId');
+        $query->andWhere(['not', ['elements.id' => $element->id]]);
+
+        // Unless site criteria is provided, force the element's site.
+        if (empty($criteria['siteId']) && empty($criteria['site'])) {
+            $query->andWhere(['elements_sites.siteId' => $element->siteId]);
+        }
+
+        $query->andWhere(['in', 'relations.targetId', $tagIds]);
+        $query->leftJoin(['relations' => Table::RELATIONS], '[[elements.id]] = [[relations.sourceId]]');
         $results = $query->all();
 
         // Fetch the elements based on the returned `id` and `siteId`
@@ -133,13 +140,13 @@ class Similar extends Component
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
         $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
-        $query->query->groupBy(['{{%relations}}.sourceId', 'elements.id']);
+        $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
-        $query->query->andWhere(['in', '{{%relations}}.targetId', $this->targetElements]);
+        $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
         $query->query->limit($this->limit); // or whatever limit is set
 
-        $query->subQuery->groupBy('elements.id');
+        $query->subQuery->groupBy(['elements.id', 'content.id']);
         if ($query->elementType === 'craft\elements\Entry') {
             $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
