@@ -7,6 +7,7 @@
 
 ### Fixed
 * Fix an SQL error related to stricter GROUP BY rules. (https://github.com/nystudio107/craft-similar/issues/19)
+* Fix an SQL error that could occur if no structure data was selected for entries. (https://github.com/nystudio107/craft-similar/issues/22)
 
 ## 1.0.6 - 2019-04-20
 ### Changed

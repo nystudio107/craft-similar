@@ -147,7 +147,7 @@ class Similar extends Component
         $query->query->limit($this->limit); // or whatever limit is set
 
         $query->subQuery->groupBy(['elements.id', 'content.id']);
-        if ($query->elementType === 'craft\elements\Entry') {
+        if ($query->withStructure || ($query->withStructure !== false && $query->structureId)) {
             $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
         $event->isValid = true;
