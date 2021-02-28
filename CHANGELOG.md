@@ -2,7 +2,7 @@
 
 ## Unreleased
 ### Changed
-* Similar elements are now fetched with the eager-loading conditions intact that were set on the criteria object.
+* Similar elements are now fetched with the eager-loading conditions intact that were set on the criteria object. (https://github.com/nystudio107/craft-similar/issues/14)
 * Similar elements are now searched in the source element site only by default.
 * Similar plugin now requires at least Craft CMS 3.2.0.
 
