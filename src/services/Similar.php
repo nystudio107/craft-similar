@@ -15,6 +15,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
+use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
@@ -65,6 +66,7 @@ class Similar extends Component
         $element = $data['element'];
         $context = $data['context'];
         $criteria = $data['criteria'] ?? [];
+
         if (\is_object($criteria)) {
             /** @var ElementQueryInterface $criteria */
             $criteria = $criteria->toArray();
@@ -97,27 +99,70 @@ class Similar extends Component
         // Return the data as an array, and only fetch the `id` and `siteId`
         $query->asArray(true);
         $query->select(['elements.id', 'elements_sites.siteId']);
-        $query->andWhere('elements.id != :id', ['id' => $element->id]);
-        $query->andWhere(['in', '{{%relations}}.targetId', $tagIds]);
-        $query->leftJoin('{{%relations}}', 'elements.id={{%relations}}.sourceId');
+        $query->andWhere(['not', ['elements.id' => $element->id]]);
+
+        // Unless site criteria is provided, force the element's site.
+        if (empty($criteria['siteId']) && empty($criteria['site'])) {
+            $query->andWhere(['elements_sites.siteId' => $element->siteId]);
+        }
+
+        $query->andWhere(['in', 'relations.targetId', $tagIds]);
+        $query->leftJoin(['relations' => Table::RELATIONS], '[[elements.id]] = [[relations.sourceId]]');
         $results = $query->all();
+
 
         // Fetch the elements based on the returned `id` and `siteId`
         $elements = Craft::$app->getElements();
         $models = [];
+
+        $queryConditions = [];
+        $similarCounts = [];
+
+        // Build the query conditions for a new element query.
+        // The reason we have to do it in two steps is because the `count` property is added by a behavior after element creation
+        // So if we just try to tack that on in the original query, it will throw an error on element creation
         foreach ($results as $config) {
-            if ($config['id'] && $config['siteId']) {
-                $model = $elements->getElementById($config['id'], $elementClass, $config['siteId']);
-                if ($model) {
-                    // The `count` property is added dynamically by our CountBehavior behavior
-                    /** @noinspection PhpUndefinedFieldInspection */
-                    $model->count = $config['count'];
-                    $models[] = $model;
+            $siteId = $config['siteId'];
+            $elementId = $config['id'];
+
+            if ($elementId && $siteId) {
+                if (empty($queryConditions[$siteId])) {
+                    $queryConditions[$siteId] = [];
                 }
+
+                // Write down elements per site and similar counts
+                $queryConditions[$siteId][] = $elementId;
+                $similarCounts[$siteId . '-' . $elementId] = $config['count'];
             }
         }
 
-        return $models;
+        // Fetch all the elements in one fell swoop, including any preset eager-loaded conditions
+        $query = $this->getElementQuery($elementClass, $criteria);
+
+        // Make sure we fetch the elements that are similar only
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function (CancelableEvent $event) use ($queryConditions) {
+            /** @var ElementQuery $query */
+            $query = $event->sender;
+            $first = true;
+
+            foreach ($queryConditions as $siteId => $elementIds) {
+                $method = $first ? 'where' : 'orWhere';
+                $query->subQuery->$method(['and', [
+                    'elements_sites.siteId' => $siteId,
+                    'elements.id' => $elementIds]
+                ]);
+            }
+        });
+
+        $elements = $query->all();
+
+        foreach ($elements as $element) {
+            // The `count` property is added dynamically by our CountBehavior behavior
+            /** @noinspection PhpUndefinedFieldInspection */
+            $element->count = $similarCounts[$element->siteId . '-' . $element->id];
+        }
+
+        return $elements;
     }
 
     // Protected Methods
@@ -133,14 +178,14 @@ class Similar extends Component
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
         $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
-        $query->query->groupBy(['{{%relations}}.sourceId', 'elements.id']);
+        $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
-        $query->query->andWhere(['in', '{{%relations}}.targetId', $this->targetElements]);
+        $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
         $query->query->limit($this->limit); // or whatever limit is set
 
-        $query->subQuery->groupBy('elements.id');
-        if ($query->elementType === 'craft\elements\Entry') {
+        $query->subQuery->groupBy(['elements.id', 'content.id']);
+        if ($query->withStructure || ($query->withStructure !== false && $query->structureId)) {
             $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
         $event->isValid = true;

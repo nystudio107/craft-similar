@@ -1,5 +1,18 @@
 # Similar Changelog
 
+## 1.1.0 - 2021.03.05
+### Added
+* Added buildchain for docs
+
+### Changed
+* Similar elements are now fetched with the eager-loading conditions intact that were set on the criteria object. (https://github.com/nystudio107/craft-similar/issues/14)
+* Similar elements are now searched in the source element site only by default.
+* Similar plugin now requires at least Craft CMS 3.2.0.
+
+### Fixed
+* Fix an SQL error related to stricter GROUP BY rules. (https://github.com/nystudio107/craft-similar/issues/19)
+* Fix an SQL error that could occur if no structure data was selected for entries. (https://github.com/nystudio107/craft-similar/issues/22)
+
 ## 1.0.6 - 2019-04-20
 ### Changed
 * Add `structureelements.structureId` to `GROUP BY` clause
