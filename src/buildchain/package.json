@@ -1,0 +1,36 @@
+{
+  "author": {
+    "email": "andrew@nystudio107.com",
+    "name": "Andrew Welch",
+    "url": "https://nystudio107.com"
+  },
+  "browser": "./src/Similar.php",
+  "bugs": {
+    "email": "andrew@nystudio107.com",
+    "url": "https://nystudio107.com"
+  },
+  "dependencies": {
+  },
+  "description": "Lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements",
+  "devDependencies": {
+ },
+  "homepage": "https://nystudio107.com",
+  "keywords": [
+    "similar",
+    "craftcms",
+    "craft",
+    "cms",
+    "plugin"
+  ],
+  "license": "SEE LICENSE IN LICENSE.md",
+  "name": "similar",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nystudio107/craft-similar.git"
+  },
+  "scripts": {
+    "docs": "cd ../docs && rm -f package-lock.json && npm install && npm run docs:build"
+  },
+  "version": "1.1.0"
+}
