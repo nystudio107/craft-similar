@@ -1,6 +1,9 @@
 # Similar Changelog
 
-## 1.1.0 - Unreleased
+## 1.1.0 - 2021.03.05
+### Added
+* Added buildchain for docs
+
 ### Changed
 * Similar elements are now fetched with the eager-loading conditions intact that were set on the criteria object. (https://github.com/nystudio107/craft-similar/issues/14)
 * Similar elements are now searched in the source element site only by default.
