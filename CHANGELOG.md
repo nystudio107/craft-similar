@@ -1,5 +1,9 @@
 # Similar Changelog
 
+## 1.1.1 - 2021.03.11
+### Fixed
+* Ensure that the key in `$similarCount` exists before referencing it
+
 ## 1.1.0 - 2021.03.05
 ### Added
 * Added buildchain for docs

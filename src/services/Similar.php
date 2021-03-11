@@ -39,8 +39,14 @@ class Similar extends Component
      */
     public $preOrder;
 
+    /**
+     * @var int
+     */
     public $limit;
 
+    /**
+     * @var Element[]
+     */
     public $targetElements;
 
     // Public Methods
@@ -132,7 +138,8 @@ class Similar extends Component
 
                 // Write down elements per site and similar counts
                 $queryConditions[$siteId][] = $elementId;
-                $similarCounts[$siteId . '-' . $elementId] = $config['count'];
+                $key = $siteId . '-' . $elementId;
+                $similarCounts[$key] = $config['count'];
             }
         }
 
@@ -158,8 +165,11 @@ class Similar extends Component
 
         foreach ($elements as $element) {
             // The `count` property is added dynamically by our CountBehavior behavior
-            /** @noinspection PhpUndefinedFieldInspection */
-            $element->count = $similarCounts[$element->siteId . '-' . $element->id];
+            $key = $element->siteId . '-' . $element->id;
+            if (!empty($similarCounts[$key])) {
+                /** @noinspection PhpUndefinedFieldInspection */
+                $element->count = $similarCounts[$key];
+            }
         }
 
         return $elements;
