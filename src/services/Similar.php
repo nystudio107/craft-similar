@@ -116,7 +116,6 @@ class Similar extends Component
         $query->leftJoin(['relations' => Table::RELATIONS], '[[elements.id]] = [[relations.sourceId]]');
         $results = $query->all();
 
-
         // Fetch the elements based on the returned `id` and `siteId`
         $elements = Craft::$app->getElements();
         $models = [];
@@ -143,6 +142,10 @@ class Similar extends Component
             }
         }
 
+        if (empty($results)) {
+            return [];
+        }
+        
         // Fetch all the elements in one fell swoop, including any preset eager-loaded conditions
         $query = $this->getElementQuery($elementClass, $criteria);
 
