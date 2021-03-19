@@ -1,6 +1,6 @@
 # Similar Changelog
 
-## Unreleased
+## 1.1.2 - Unreleased
 ### Fixed
 * Fixed an SQL error related to even stricter GROUP BY rules.
 * Fixed an error where using a tag field that had no matches on other elements could return a random set of entries.
