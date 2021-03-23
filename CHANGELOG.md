@@ -1,5 +1,10 @@
 # Similar Changelog
 
+## 1.1.2 - 2021.03.23
+### Fixed
+* Fixed an SQL error related to even stricter GROUP BY rules.
+* Fixed an error where using a tag field that had no matches on other elements could return a random set of entries. [\#37](https://github.com/nystudio107/craft-similar/issues/31)
+
 ## 1.1.1 - 2021.03.11
 ### Fixed
 * Ensure that the key in `$similarCount` exists before referencing it

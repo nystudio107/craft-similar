@@ -116,7 +116,6 @@ class Similar extends Component
         $query->leftJoin(['relations' => Table::RELATIONS], '[[elements.id]] = [[relations.sourceId]]');
         $results = $query->all();
 
-
         // Fetch the elements based on the returned `id` and `siteId`
         $elements = Craft::$app->getElements();
         $models = [];
@@ -143,6 +142,10 @@ class Similar extends Component
             }
         }
 
+        if (empty($results)) {
+            return [];
+        }
+        
         // Fetch all the elements in one fell swoop, including any preset eager-loaded conditions
         $query = $this->getElementQuery($elementClass, $criteria);
 
@@ -194,7 +197,12 @@ class Similar extends Component
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
         $query->query->limit($this->limit); // or whatever limit is set
 
-        $query->subQuery->groupBy(['elements.id', 'content.id']);
+        $query->subQuery->groupBy(['elements.id', 'content.id', 'elements_sites.id']);
+        
+        if ($query instanceof EntryQuery) {
+            $query->subQuery->addGroupBy(['entries.postDate']);
+        }
+
         if ($query->withStructure || ($query->withStructure !== false && $query->structureId)) {
             $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
