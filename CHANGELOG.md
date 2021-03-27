@@ -1,5 +1,9 @@
 # Similar Changelog
 
+## 1.1.4 - 2021.03.27
+### Changed
+* Move settings from the `composer.json` “extra” to the plugin main class
+
 ## 1.1.3 - 2021.03.27
 ### Fixed
 * Fixed an issue with using `RAND()` in the sort criteria (https://github.com/nystudio107/craft-similar/issues/32)
