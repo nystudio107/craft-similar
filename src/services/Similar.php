@@ -145,7 +145,7 @@ class Similar extends Component
         if (empty($results)) {
             return [];
         }
-        
+
         // Fetch all the elements in one fell swoop, including any preset eager-loaded conditions
         $query = $this->getElementQuery($elementClass, $criteria);
 
@@ -190,7 +190,13 @@ class Similar extends Component
         $query = $event->sender;
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
-        $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
+        if (is_array($this->preOrder)) {
+            $query->query->orderBy(array_merge([
+                'count' => 'DESC',
+            ], $this->preOrder));
+        } elseif (is_string($this->preOrder)) {
+            $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
+        }
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
         $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
@@ -198,7 +204,7 @@ class Similar extends Component
         $query->query->limit($this->limit); // or whatever limit is set
 
         $query->subQuery->groupBy(['elements.id', 'content.id', 'elements_sites.id']);
-        
+
         if ($query instanceof EntryQuery) {
             $query->subQuery->addGroupBy(['entries.postDate']);
         }
