@@ -2,7 +2,7 @@
     "name": "nystudio107/craft-similar",
     "description": "Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.",
     "type": "craft-plugin",
-    "version": "1.1.3",
+    "version": "1.1.4",
     "keywords": [
         "craft",
         "cms",
@@ -34,13 +34,7 @@
     "extra": {
         "name": "Similar",
         "handle": "similar",
-        "schemaVersion": "1.0.0",
-        "hasCpSettings": false,
-        "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/nystudio107/craft-similar/v1/CHANGELOG.md",
-        "components": {
-            "similar": "nystudio107\\similar\\services\\Similar"
-        },
         "class": "nystudio107\\similar\\Similar"
     }
 }
