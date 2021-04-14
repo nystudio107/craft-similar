@@ -1,22 +1,29 @@
-TAG?=12-alpine
-CONTAINER?=similar-buildchain
-DEST?=../../sites/nystudio107/web/docs/similar
+TAG?=14-alpine
+CONTAINER?=$(shell basename $(CURDIR))-buildchain
+DOCKERRUN=docker container run \
+	--name ${CONTAINER} \
+	--rm \
+	-t \
+	-v `pwd`:/app \
+	${CONTAINER}:${TAG}
+DOCSDEST?=../../sites/nystudio107/web/docs/similar
 
-.PHONY: docs install npm
+.PHONY: docker docs npm
 
 docker:
 	docker build \
 		. \
-		-t nystudio107/${CONTAINER}:${TAG} \
+		-t ${CONTAINER}:${TAG} \
 		--build-arg TAG=${TAG} \
 		--no-cache
-docs:
-	docker container run \
-		--name ${CONTAINER} \
-		--rm \
-		-t \
-		-v `pwd`:/app \
-		nystudio107/${CONTAINER}:${TAG} \
+docs: docker
+	${DOCKERRUN} \
 		run docs
-	rm -rf ${DEST}
-	mv ./docs/docs/.vuepress/dist ${DEST}
+	rm -rf ${DOCSDEST}
+	mv ./docs/docs/.vuepress/dist ${DOCSDEST}
+npm: docker
+	${DOCKERRUN} \
+		$(filter-out $@,$(MAKECMDGOALS))
+%:
+	@:
+# ref: https://stackoverflow.com/questions/6273608/how-to-pass-argument-to-makefile-from-command-line
