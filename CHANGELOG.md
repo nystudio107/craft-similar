@@ -1,5 +1,9 @@
 # Similar Changelog
 
+## 1.1.5 - UNRELEAED
+### Changed
+* Updated `Makefile` to use `node-14-alpine`
+
 ## 1.1.4 - 2021.03.27
 ### Changed
 * Move settings from the `composer.json` “extra” to the plugin main class
