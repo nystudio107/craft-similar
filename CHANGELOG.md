@@ -1,9 +1,10 @@
 # Similar Changelog
 
-## 1.1.5 - UNRELEASED
+## 1.1.5 - 2021.06.03
 ### Changed
-* Updated `Makefile` to use `node-14-alpine`
 * If `orderBy` criteria is omitted, entries are now sorted by the number of relations in common. (https://github.com/nystudio107/craft-similar/issues/35)
+* Switch to VitePress for documentation
+* Updated `Makefile` to use `node-14-alpine`
 
 ## 1.1.4 - 2021.03.27
 ### Changed
