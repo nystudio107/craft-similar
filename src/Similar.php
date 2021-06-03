@@ -18,9 +18,7 @@ use nystudio107\similar\variables\SimilarVariable;
 use Craft;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
-use craft\events\PluginEvent;
 use craft\events\PopulateElementEvent;
-use craft\services\Plugins;
 use craft\web\twig\variables\CraftVariable;
 
 use yii\base\Event;
@@ -97,7 +95,6 @@ class Similar extends Plugin
                 $variable->set('similar', SimilarVariable::class);
             }
         );
-
         Event::on(
             ElementQuery::class,
             ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
@@ -106,15 +103,6 @@ class Similar extends Plugin
                 /** @var Element $element */
                 $element->attachBehavior('myCountBehavior', CountBehavior::class);
         });
-
-        Event::on(
-            Plugins::class,
-            Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-            function (PluginEvent $event) {
-                if ($event->plugin === $this) {
-                }
-            }
-        );
 
         Craft::info(
             Craft::t(

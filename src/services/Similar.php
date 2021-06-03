@@ -175,6 +175,12 @@ class Similar extends Component
             }
         }
 
+        if (empty($data['criteria']['orderBy'])) {
+            usort($elements, function ($a, $b) {
+                return $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1);
+            });
+        }
+
         return $elements;
     }
 
