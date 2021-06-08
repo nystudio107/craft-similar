@@ -8,7 +8,7 @@ module.exports = {
         docsDir: 'docs/docs',
         docsBranch: 'v1',
         algolia: {
-            apiKey: '',
+            apiKey: '8fa8568c2723a011dfce546db408b3c9',
             indexName: 'similar'
         },
         editLinks: true,
