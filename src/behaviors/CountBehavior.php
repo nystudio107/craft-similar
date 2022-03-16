@@ -25,7 +25,7 @@ class CountBehavior extends Behavior
     /**
      * @var int
      */
-    public $count;
+    public int $count = 0;
 
     // Public Methods
     // =========================================================================
