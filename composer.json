@@ -1,40 +1,40 @@
 {
-    "name": "nystudio107/craft-similar",
-    "description": "Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.",
-    "type": "craft-plugin",
-    "version": "1.1.5",
-    "keywords": [
-        "craft",
-        "cms",
-        "craftcms",
-        "craft-plugin",
-        "elements",
-        "relations",
-        "similar"
-    ],
-    "support": {
-        "docs": "https://nystudio107.com/plugins/similar/documentation",
-        "issues": "https://nystudio107.com/plugins/similar/support"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "nystudio107.com",
-            "homepage": "https://nystudio107.com/"
-        }
-    ],
-    "require": {
-        "craftcms/cms": "^3.2.0"
-    },
-    "autoload": {
-        "psr-4": {
-          "nystudio107\\similar\\": "src/"
-        }
-    },
-    "extra": {
-        "name": "Similar",
-        "handle": "similar",
-        "changelogUrl": "https://raw.githubusercontent.com/nystudio107/craft-similar/v1/CHANGELOG.md",
-        "class": "nystudio107\\similar\\Similar"
+  "name": "nystudio107/craft-similar",
+  "description": "Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.",
+  "type": "craft-plugin",
+  "version": "4.0.0-beta.1",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin",
+    "elements",
+    "relations",
+    "similar"
+  ],
+  "support": {
+    "docs": "https://nystudio107.com/docs/similar/",
+    "issues": "https://nystudio107.com/plugins/similar/support",
+    "source": "https://github.com/nystudio107/craft-similar"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "nystudio107.com",
+      "homepage": "https://nystudio107.com/"
     }
+  ],
+  "require": {
+    "craftcms/cms": "^4.0.0-beta.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "nystudio107\\similar\\": "src/"
+    }
+  },
+  "extra": {
+    "class": "nystudio107\\similar\\Similar",
+    "handle": "similar",
+    "name": "Similar"
+  }
 }
