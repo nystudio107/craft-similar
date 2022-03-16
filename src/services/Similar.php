@@ -47,7 +47,7 @@ class Similar extends Component
     /**
      * @var Element[]
      */
-    public $targetElements;
+    public $targetElements = [];
 
     // Public Methods
     // =========================================================================
@@ -58,7 +58,7 @@ class Similar extends Component
      * @return mixed
      * @throws Exception
      */
-    public function find($data)
+    public function find($data): array|\craft\elements\Entry
     {
         if (!isset($data['element'])) {
             throw new Exception('Required parameter `element` was not supplied to `craft.similar.find`.');
@@ -79,7 +79,7 @@ class Similar extends Component
         }
 
         // Get an ElementQuery for this Element
-        $elementClass = \is_object($element) ? \get_class($element) : $element;
+        $elementClass = \is_object($element) ? $element::class : $element;
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
 
@@ -98,14 +98,15 @@ class Similar extends Component
             /** @var ElementQueryInterface $context */
             $tagIds = $context->ids();
         }
+
         $this->targetElements = $tagIds;
 
         // We need to modify the actual craft\db\Query after the ElementQuery has been prepared
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, [$this, 'eventAfterPrepareHandler']);
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, fn(\craft\events\CancelableEvent $event) => $this->eventAfterPrepareHandler($event));
         // Return the data as an array, and only fetch the `id` and `siteId`
         $query->asArray(true);
         $query->select(['elements.id', 'elements_sites.siteId']);
-        $query->andWhere(['not', ['elements.id' => $element->id]]);
+        $query->andWhere(['not', ['elements.id' => $element->getId()]]);
 
         // Unless site criteria is provided, force the element's site.
         if (empty($criteria['siteId']) && empty($criteria['site'])) {
@@ -114,11 +115,11 @@ class Similar extends Component
 
         $query->andWhere(['in', 'relations.targetId', $tagIds]);
         $query->leftJoin(['relations' => Table::RELATIONS], '[[elements.id]] = [[relations.sourceId]]');
+
         $results = $query->all();
 
         // Fetch the elements based on the returned `id` and `siteId`
         $elements = Craft::$app->getElements();
-        $models = [];
 
         $queryConditions = [];
         $similarCounts = [];
@@ -150,7 +151,7 @@ class Similar extends Component
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Make sure we fetch the elements that are similar only
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function (CancelableEvent $event) use ($queryConditions) {
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function (CancelableEvent $event) use ($queryConditions): void {
             /** @var ElementQuery $query */
             $query = $event->sender;
             $first = true;
@@ -176,21 +177,13 @@ class Similar extends Component
         }
 
         if (empty($data['criteria']['orderBy'])) {
-            usort($elements, function ($a, $b) {
-                return $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1);
-            });
+            usort($elements, fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
         }
 
         return $elements;
     }
 
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * @param CancelableEvent $event
-     */
-    protected function eventAfterPrepareHandler(CancelableEvent $event)
+    protected function eventAfterPrepareHandler(CancelableEvent $event): void
     {
         /** @var ElementQuery $query */
         $query = $event->sender;
@@ -203,9 +196,11 @@ class Similar extends Component
         } elseif (is_string($this->preOrder)) {
             $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
         }
+
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
         $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
+
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
         $query->query->limit($this->limit); // or whatever limit is set
 
@@ -218,6 +213,7 @@ class Similar extends Component
         if ($query->withStructure || ($query->withStructure !== false && $query->structureId)) {
             $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
+
         $event->isValid = true;
     }
 
@@ -226,8 +222,6 @@ class Similar extends Component
      *
      * @var string|ElementInterface $elementType
      * @var array                   $criteria
-     *
-     * @return ElementQueryInterface
      */
     protected function getElementQuery($elementType, array $criteria): ElementQueryInterface
     {

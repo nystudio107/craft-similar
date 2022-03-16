@@ -28,7 +28,7 @@ class SimilarVariable
      * @return mixed
      * @throws \yii\base\Exception
      */
-    public function find($data)
+    public function find($data): array|\craft\elements\Entry
     {
         return Similar::$plugin->similar->find($data);
     }

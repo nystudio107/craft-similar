@@ -63,17 +63,17 @@ class Similar extends Plugin
     /**
      * @var string
      */
-    public $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.0.0';
 
     /**
      * @var bool
      */
-    public $hasCpSection = false;
+    public bool $hasCpSection = false;
 
     /**
      * @var bool
      */
-    public $hasCpSettings = false;
+    public bool $hasCpSettings = false;
 
     // Public Methods
     // =========================================================================
@@ -81,7 +81,7 @@ class Similar extends Plugin
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         self::$plugin = $this;
@@ -89,7 +89,7 @@ class Similar extends Plugin
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            function (Event $event) {
+            function (Event $event): void {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('similar', SimilarVariable::class);
@@ -98,9 +98,9 @@ class Similar extends Plugin
         Event::on(
             ElementQuery::class,
             ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) {
-                $element = $event->element;
+            function(PopulateElementEvent $event): void {
                 /** @var Element $element */
+                $element = $event->element;
                 $element->attachBehavior('myCountBehavior', CountBehavior::class);
         });
 
