@@ -10,17 +10,15 @@
 
 namespace nystudio107\similar;
 
-use craft\base\Element;
-use nystudio107\similar\behaviors\CountBehavior;
-use nystudio107\similar\services\Similar as SimilarService;
-use nystudio107\similar\variables\SimilarVariable;
-
 use Craft;
+use craft\base\Element;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
 use craft\events\PopulateElementEvent;
 use craft\web\twig\variables\CraftVariable;
-
+use nystudio107\similar\behaviors\CountBehavior;
+use nystudio107\similar\services\Similar as SimilarService;
+use nystudio107\similar\variables\SimilarVariable;
 use yii\base\Event;
 
 /**
@@ -38,24 +36,9 @@ class Similar extends Plugin
     // =========================================================================
 
     /**
-     * @var Similar
+     * @var ?Similar
      */
-    public static $plugin;
-
-    // Static Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($id, $parent = null, array $config = [])
-    {
-        $config['components'] = [
-            'similar' => SimilarService::class,
-        ];
-
-        parent::__construct($id, $parent, $config);
-    }
+    public static ?Similar $plugin = null;
 
     // Public Properties
     // =========================================================================
@@ -69,11 +52,22 @@ class Similar extends Plugin
      * @var bool
      */
     public bool $hasCpSection = false;
-
     /**
      * @var bool
      */
     public bool $hasCpSettings = false;
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($id, $parent = null, array $config = [])
+    {
+        $config['components'] = [
+            'similar' => SimilarService::class,
+        ];
+
+        parent::__construct($id, $parent, $config);
+    }
 
     // Public Methods
     // =========================================================================
@@ -89,7 +83,7 @@ class Similar extends Plugin
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            function (Event $event): void {
+            static function (Event $event): void {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('similar', SimilarVariable::class);
@@ -98,11 +92,11 @@ class Similar extends Plugin
         Event::on(
             ElementQuery::class,
             ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event): void {
+            static function (PopulateElementEvent $event): void {
                 /** @var Element $element */
                 $element = $event->element;
                 $element->attachBehavior('myCountBehavior', CountBehavior::class);
-        });
+            });
 
         Craft::info(
             Craft::t(

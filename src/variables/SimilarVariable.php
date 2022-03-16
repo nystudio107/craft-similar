@@ -10,7 +10,9 @@
 
 namespace nystudio107\similar\variables;
 
+use craft\base\ElementInterface;
 use nystudio107\similar\Similar;
+use yii\base\Exception;
 
 /**
  * @author    nystudio107.com
@@ -23,12 +25,12 @@ class SimilarVariable
     // =========================================================================
 
     /**
-     * @param $data
+     * @param array $data
      *
-     * @return mixed
-     * @throws \yii\base\Exception
+     * @return array|ElementInterface
+     * @throws Exception
      */
-    public function find($data): array|\craft\elements\Entry
+    public function find(array $data): array|ElementInterface
     {
         return Similar::$plugin->similar->find($data);
     }

@@ -1,5 +1,11 @@
 # Similar Changelog
 
+## 4.0.0-beta.1 - 2022.03.15
+
+### Added
+
+* Initial Craft CMS 4 compatibility
+
 ## 1.1.5 - 2021.06.03
 ### Changed
 * If `orderBy` criteria is omitted, entries are now sorted by the number of relations in common. (https://github.com/nystudio107/craft-similar/issues/35)

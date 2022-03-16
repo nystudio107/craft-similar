@@ -19,10 +19,10 @@ use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
-use craft\elements\Entry;
 use craft\events\CancelableEvent;
-
 use yii\base\Exception;
+use function is_array;
+use function is_object;
 
 /**
  * @author    nystudio107.com
@@ -35,30 +35,30 @@ class Similar extends Component
     // =========================================================================
 
     /**
-     * @var string The previous order in the query
+     * @var string|array The previous order in the query
      */
-    public $preOrder;
+    public string|array $preOrder = [];
 
     /**
-     * @var int
+     * @var ?int
      */
-    public $limit;
+    public ?int $limit = null;
 
     /**
      * @var Element[]
      */
-    public $targetElements = [];
+    public array $targetElements = [];
 
     // Public Methods
     // =========================================================================
 
     /**
-     * @param $data
+     * @param array $data
      *
-     * @return mixed
+     * @return array|ElementInterface
      * @throws Exception
      */
-    public function find($data): array|\craft\elements\Entry
+    public function find(array $data): array|ElementInterface
     {
         if (!isset($data['element'])) {
             throw new Exception('Required parameter `element` was not supplied to `craft.similar.find`.');
@@ -73,26 +73,21 @@ class Similar extends Component
         $context = $data['context'];
         $criteria = $data['criteria'] ?? [];
 
-        if (\is_object($criteria)) {
+        if (is_object($criteria)) {
             /** @var ElementQueryInterface $criteria */
             $criteria = $criteria->toArray();
         }
 
         // Get an ElementQuery for this Element
-        $elementClass = \is_object($element) ? $element::class : $element;
+        $elementClass = is_object($element) ? $element::class : $element;
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
-
-        // If the $query is null, just return an empty Entry
-        if (!$query) { // no results
-            return new Entry();
-        }
 
         // Stash any orderBy directives from the $query for our anonymous function
         $this->preOrder = $query->orderBy;
         $this->limit = $query->limit;
         // Extract the $tagIds from the $context
-        if (\is_array($context)) {
+        if (is_array($context)) {
             $tagIds = $context;
         } else {
             /** @var ElementQueryInterface $context */
@@ -102,7 +97,7 @@ class Similar extends Component
         $this->targetElements = $tagIds;
 
         // We need to modify the actual craft\db\Query after the ElementQuery has been prepared
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, fn(\craft\events\CancelableEvent $event) => $this->eventAfterPrepareHandler($event));
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, fn(CancelableEvent $event) => $this->eventAfterPrepareHandler($event));
         // Return the data as an array, and only fetch the `id` and `siteId`
         $query->asArray(true);
         $query->select(['elements.id', 'elements_sites.siteId']);
@@ -119,8 +114,6 @@ class Similar extends Component
         $results = $query->all();
 
         // Fetch the elements based on the returned `id` and `siteId`
-        $elements = Craft::$app->getElements();
-
         $queryConditions = [];
         $similarCounts = [];
 
@@ -177,7 +170,7 @@ class Similar extends Component
         }
 
         if (empty($data['criteria']['orderBy'])) {
-            usort($elements, fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
+            usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
         }
 
         return $elements;
@@ -194,7 +187,7 @@ class Similar extends Component
                 'count' => 'DESC',
             ], $this->preOrder));
         } elseif (is_string($this->preOrder)) {
-            $query->query->orderBy('count DESC, '.str_replace('`', '', $this->preOrder));
+            $query->query->orderBy('count DESC, ' . str_replace('`', '', $this->preOrder));
         }
 
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
@@ -220,10 +213,11 @@ class Similar extends Component
     /**
      * Returns the element query based on $elementType and $criteria
      *
-     * @var string|ElementInterface $elementType
-     * @var array                   $criteria
+     * @param string|ElementInterface $elementType
+     * @param array $criteria
+     * @return ElementQueryInterface
      */
-    protected function getElementQuery($elementType, array $criteria): ElementQueryInterface
+    protected function getElementQuery(string|ElementInterface $elementType, array $criteria): ElementQueryInterface
     {
         /** @var string|ElementInterface $elementType */
         $query = $elementType::find();
