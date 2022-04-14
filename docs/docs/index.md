@@ -54,7 +54,7 @@ The plugin has one template method, `find`, which takes a parameters object with
 There is also a third, optional parameter that you probably would want to use most of the time, `criteria`. `criteria` lets you create the base ElementQuery that Similar will extend, giving you the ability to use all of Craft’s usual goodies for your queries. If you’d want to limit the number of entries returned (good idea!), you could do it like this:
 
 ```twig
-    {% set limitCriteria = craft.entries.limit(4) %}
+    {% set limitCriteria = craft.entries().limit(4) %}
     {% set similarEntriesByTags = craft.similar.find({ element: entry, context: entry.tags, criteria: limitCriteria }) %}
     
     <ul>
@@ -64,13 +64,21 @@ There is also a third, optional parameter that you probably would want to use mo
     </ul>
 ```
 
+Since the `criteria` is an ElementQuery, you can tailor your results set to narrow in on one section of content, or force an association with a particular category, tag, etc. Expanding on the `limitCriteria` variable above, these would all be possibilities:
+
+```twig
+   {% set limitCriteria = craft.entries().section(['recipes','ingredients']).limit(4) %}
+   {% set limitCriteria = craft.entries().myField(':notEmpty:').limit(4) %}
+   {% set limitCriteria = craft.entries().type('vlogEntry').limit(8) %}
+```
+
 The supported element types are `Entry`, `Asset`, `Category`, `Tag`, `User` and `Commerce_Product`. If you miss one, send me a feature request.
 
 The `context` parameter takes either an `ElementQuery`, or a list of IDs. To find similar entries based on an entry’s tags and categories, you could do:
 
  ```twig
     {% set ids = entry.tags.ids() | merge(entry.categories.ids()) %}
-    {% set limitCriteria = craft.entries.limit(4) %}
+    {% set limitCriteria = craft.entries().limit(4) %}
     {% set similarEntriesByTagsAndCategories = craft.similar.find({ element: entry, context: ids, criteria: limitCriteria }) %}
 ```
 
