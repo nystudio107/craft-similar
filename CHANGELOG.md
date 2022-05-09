@@ -1,5 +1,12 @@
 # Similar Changelog
 
+## 4.0.0 - 2022.05.09
+### Added
+* Initial Craft CMS 4 release
+
+### Fixed
+* Fixed an issue where passing an `ElementQuery` into `criteria` would cause it to throw a type error ([#44](https://github.com/nystudio107/craft-similar/issues/44))
+
 ## 4.0.0-beta.1 - 2022.03.15
 
 ### Added

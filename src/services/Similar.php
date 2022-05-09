@@ -169,7 +169,7 @@ class Similar extends Component
             }
         }
 
-        if (empty($data['criteria']['orderBy'])) {
+        if (empty($criteria['orderBy'])) {
             usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
         }
 
