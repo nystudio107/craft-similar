@@ -161,6 +161,7 @@ class Similar extends Component
 
         $elements = $query->all();
 
+        /** @var Element $element */
         foreach ($elements as $element) {
             // The `count` property is added dynamically by our CountBehavior behavior
             $key = $element->siteId . '-' . $element->id;
