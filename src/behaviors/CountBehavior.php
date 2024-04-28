@@ -29,5 +29,4 @@ class CountBehavior extends Behavior
 
     // Public Methods
     // =========================================================================
-
 }

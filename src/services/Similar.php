@@ -68,7 +68,7 @@ class Similar extends Component
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
 
-        /** @var Element $element */
+        /** @var class-string|Element $element */
         $element = $data['element'];
         $context = $data['context'];
         $criteria = $data['criteria'] ?? [];
@@ -84,7 +84,7 @@ class Similar extends Component
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Stash any orderBy directives from the $query for our anonymous function
-        $this->preOrder = $query->orderBy;
+        $this->preOrder = $query->orderBy ?? [];
         $this->limit = $query->limit;
         // Extract the $tagIds from the $context
         if (is_array($context)) {
@@ -144,32 +144,35 @@ class Similar extends Component
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Make sure we fetch the elements that are similar only
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function (CancelableEvent $event) use ($queryConditions): void {
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function(CancelableEvent $event) use ($queryConditions): void {
             /** @var ElementQuery $query */
             $query = $event->sender;
             $first = true;
 
             foreach ($queryConditions as $siteId => $elementIds) {
                 $method = $first ? 'where' : 'orWhere';
+                $first = false;
                 $query->subQuery->$method(['and', [
                     'elements_sites.siteId' => $siteId,
-                    'elements.id' => $elementIds]
+                    'elements.id' => $elementIds,],
                 ]);
             }
         });
 
         $elements = $query->all();
 
+        /** @var Element $element */
         foreach ($elements as $element) {
             // The `count` property is added dynamically by our CountBehavior behavior
             $key = $element->siteId . '-' . $element->id;
             if (!empty($similarCounts[$key])) {
-                /** @noinspection PhpUndefinedFieldInspection */
+                /** @phpstan-ignore-next-line */
                 $element->count = $similarCounts[$key];
             }
         }
 
         if (empty($criteria['orderBy'])) {
+            /** @phpstan-ignore-next-line */
             usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
         }
 

@@ -1,20 +1,18 @@
 ---
-title: Similar plugin for Craft CMS 3.x
+title: Similar plugin for Craft CMS
 description: Documentation for the Similar plugin. The Similar plugin lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... Other related elements.
 ---
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/quality-score.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v1) [![Code Coverage](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/coverage.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v1) [![Build Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/build.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/build-status/v1) [![Code Intelligence Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/code-intelligence.svg?b=v1)](https://scrutinizer-ci.com/code-intelligence)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/quality-score.png?b=v4)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v4) [![Code Coverage](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/coverage.png?b=v4)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v4) [![Build Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/build.png?b=v4)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/build-status/v4) [![Code Intelligence Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/code-intelligence.svg?b=v4)](https://scrutinizer-ci.com/code-intelligence)
 
-# Similar plugin for Craft CMS 3.x
+# Similar plugin for Craft CMS 4.x
 
 Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... Other related elements.
 
 ![Screenshot](./resources/img/plugin-logo.png)
 
-Related: [Similar for Craft 2.x](https://github.com/aelvan/Similar-Craft)
-
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0 or later.
+This plugin requires Craft CMS 4.0.0 or later.
 
 ## Installation
 
@@ -34,9 +32,9 @@ You can also install Similar via the **Plugin Store** in the Craft AdminCP.
 
 ## Similar Overview
 
-Similar is a Craft CMS 3 port of the [Similar for Craft 2.x](https://github.com/aelvan/Similar-Craft) plugin by André Elvan.
+Similar is a Craft CMS 4 port of the [Similar for Craft 2.x](https://github.com/aelvan/Similar-Craft) plugin by André Elvan.
 
-Below is the original README.md (with minor edits to reflect changes due to the port to Craft CMS 3):
+Below is the original README.md (with minor edits to reflect changes due to the port to Craft CMS 4):
 
 ## Using Similar
 

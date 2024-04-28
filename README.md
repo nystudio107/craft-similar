@@ -1,12 +1,10 @@
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/quality-score.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v1) [![Code Coverage](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/coverage.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v1) [![Build Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/build.png?b=v1)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/build-status/v1) [![Code Intelligence Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/code-intelligence.svg?b=v1)](https://scrutinizer-ci.com/code-intelligence)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/quality-score.png?b=v4)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v4) [![Code Coverage](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/coverage.png?b=v4)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/?branch=v4) [![Build Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/build.png?b=v4)](https://scrutinizer-ci.com/g/nystudio107/craft-similar/build-status/v4) [![Code Intelligence Status](https://scrutinizer-ci.com/g/nystudio107/craft-similar/badges/code-intelligence.svg?b=v4)](https://scrutinizer-ci.com/code-intelligence)
 
 # Similar plugin for Craft CMS 4.x
 
 Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.
 
 ![Screenshot](./docs/docs/resources/img/plugin-logo.png)
-
-Related: [Similar for Craft 2.x](https://github.com/aelvan/Similar-Craft)
 
 ## Requirements
 
