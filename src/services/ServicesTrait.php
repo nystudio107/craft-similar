@@ -36,7 +36,7 @@ trait ServicesTrait
         // ref: https://github.com/craftcms/cms/issues/1989
         $config = ArrayHelper::merge([
             'components' => [
-                'minify' => SimilarService::class,
+                'similar' => SimilarService::class,
             ],
         ], $config);
 
