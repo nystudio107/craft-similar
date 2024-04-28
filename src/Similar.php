@@ -17,7 +17,7 @@ use craft\elements\db\ElementQuery;
 use craft\events\PopulateElementEvent;
 use craft\web\twig\variables\CraftVariable;
 use nystudio107\similar\behaviors\CountBehavior;
-use nystudio107\similar\services\Similar as SimilarService;
+use nystudio107\similar\services\ServicesTrait;
 use nystudio107\similar\variables\SimilarVariable;
 use yii\base\Event;
 
@@ -27,11 +27,14 @@ use yii\base\Event;
  * @author    nystudio107.com
  * @package   Similar
  * @since     1.0.0
- *
- * @property  SimilarService $similar
  */
 class Similar extends Plugin
 {
+    // Traits
+    // =========================================================================
+
+    use ServicesTrait;
+
     // Static Properties
     // =========================================================================
 
@@ -83,7 +86,7 @@ class Similar extends Plugin
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            static function (Event $event): void {
+            static function(Event $event): void {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('similar', SimilarVariable::class);
@@ -92,7 +95,7 @@ class Similar extends Plugin
         Event::on(
             ElementQuery::class,
             ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            static function (PopulateElementEvent $event): void {
+            static function(PopulateElementEvent $event): void {
                 /** @var Element $element */
                 $element = $event->element;
                 $element->attachBehavior('myCountBehavior', CountBehavior::class);
