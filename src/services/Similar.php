@@ -153,7 +153,7 @@ class Similar extends Component
                 $method = $first ? 'where' : 'orWhere';
                 $query->subQuery->$method(['and', [
                     'elements_sites.siteId' => $siteId,
-                    'elements.id' => $elementIds]
+                    'elements.id' => $elementIds, ],
                 ]);
             }
         });

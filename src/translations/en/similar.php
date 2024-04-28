@@ -14,5 +14,5 @@
  * @since     1.0.0
  */
 return [
-    '{name} plugin loaded' => '{name} plugin loaded'
+    '{name} plugin loaded' => '{name} plugin loaded',
 ];
