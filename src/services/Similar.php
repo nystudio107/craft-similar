@@ -84,7 +84,7 @@ class Similar extends Component
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Stash any orderBy directives from the $query for our anonymous function
-        $this->preOrder = $query->orderBy;
+        $this->preOrder = $query->orderBy ?? [];
         $this->limit = $query->limit;
         // Extract the $tagIds from the $context
         if (is_array($context)) {
@@ -144,7 +144,7 @@ class Similar extends Component
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Make sure we fetch the elements that are similar only
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function (CancelableEvent $event) use ($queryConditions): void {
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function(CancelableEvent $event) use ($queryConditions): void {
             /** @var ElementQuery $query */
             $query = $event->sender;
             $first = true;
