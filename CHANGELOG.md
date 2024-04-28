@@ -1,6 +1,6 @@
 # Similar Changelog
 
-## 1.1.6 - UNRELEASED
+## 1.1.6 - 2024.04.28
 ### Added
 * Added `ServicesTrait` for the plugin service component registration
 * Add `phpstan` and `ecs` code linting
