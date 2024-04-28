@@ -68,7 +68,7 @@ class Similar extends Component
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
 
-        /** @var Element $element */
+        /** @var class-string|Element $element */
         $element = $data['element'];
         $context = $data['context'];
         $criteria = $data['criteria'] ?? [];
@@ -151,9 +151,10 @@ class Similar extends Component
 
             foreach ($queryConditions as $siteId => $elementIds) {
                 $method = $first ? 'where' : 'orWhere';
+                $first = false;
                 $query->subQuery->$method(['and', [
                     'elements_sites.siteId' => $siteId,
-                    'elements.id' => $elementIds, ],
+                    'elements.id' => $elementIds,],
                 ]);
             }
         });
@@ -164,12 +165,13 @@ class Similar extends Component
             // The `count` property is added dynamically by our CountBehavior behavior
             $key = $element->siteId . '-' . $element->id;
             if (!empty($similarCounts[$key])) {
-                /** @noinspection PhpUndefinedFieldInspection */
+                /** @phpstan-ignore-next-line */
                 $element->count = $similarCounts[$key];
             }
         }
 
         if (empty($criteria['orderBy'])) {
+            /** @phpstan-ignore-next-line */
             usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
         }
 

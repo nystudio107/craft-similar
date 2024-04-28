@@ -60,18 +60,6 @@ class Similar extends Plugin
      */
     public bool $hasCpSettings = false;
 
-    /**
-     * @inheritdoc
-     */
-    public function __construct($id, $parent = null, array $config = [])
-    {
-        $config['components'] = [
-            'similar' => SimilarService::class,
-        ];
-
-        parent::__construct($id, $parent, $config);
-    }
-
     // Public Methods
     // =========================================================================
 
