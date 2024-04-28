@@ -19,7 +19,6 @@ use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
-use craft\elements\Entry;
 use craft\events\CancelableEvent;
 use yii\base\Exception;
 use function get_class;
@@ -37,7 +36,7 @@ class Similar extends Component
     // =========================================================================
 
     /**
-     * @var string The previous order in the query
+     * @var string|array The previous order in the query
      */
     public $preOrder;
 
@@ -70,7 +69,7 @@ class Similar extends Component
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
 
-        /** @var Element $element */
+        /** @var Element|class-string $element */
         $element = $data['element'];
         $context = $data['context'];
         $criteria = $data['criteria'] ?? [];
@@ -84,11 +83,6 @@ class Similar extends Component
         $elementClass = is_object($element) ? get_class($element) : $element;
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
-
-        // If the $query is null, just return an empty Entry
-        if (!$query) { // no results
-            return new Entry();
-        }
 
         // Stash any orderBy directives from the $query for our anonymous function
         $this->preOrder = $query->orderBy ?? [];
@@ -159,9 +153,10 @@ class Similar extends Component
 
             foreach ($queryConditions as $siteId => $elementIds) {
                 $method = $first ? 'where' : 'orWhere';
+                $first = false;
                 $query->subQuery->$method(['and', [
                     'elements_sites.siteId' => $siteId,
-                    'elements.id' => $elementIds, ],
+                    'elements.id' => $elementIds,],
                 ]);
             }
         });
@@ -172,13 +167,14 @@ class Similar extends Component
             // The `count` property is added dynamically by our CountBehavior behavior
             $key = $element->siteId . '-' . $element->id;
             if (!empty($similarCounts[$key])) {
-                /** @noinspection PhpUndefinedFieldInspection */
+                /** @phpstan-ignore-next-line */
                 $element->count = $similarCounts[$key];
             }
         }
 
         if (empty($data['criteria']['orderBy'])) {
             usort($elements, function($a, $b) {
+                /** @phpstan-ignore-next-line */
                 return $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1);
             });
         }
@@ -226,10 +222,9 @@ class Similar extends Component
     /**
      * Returns the element query based on $elementType and $criteria
      *
+     * @param class-string|ElementInterface $elementType
+     * @param array $criteria
      * @return ElementQueryInterface
-     * @var array $criteria
-     *
-     * @var string|ElementInterface $elementType
      */
     protected function getElementQuery($elementType, array $criteria): ElementQueryInterface
     {
