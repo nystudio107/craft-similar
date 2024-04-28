@@ -2,7 +2,7 @@
   "name": "nystudio107/craft-similar",
   "description": "Similar for Craft lets you find elements, Entries, Categories, Commerce Products, etc, that are similar, based on... other related elements.",
   "type": "craft-plugin",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "keywords": [
     "craft",
     "cms",
@@ -25,7 +25,8 @@
     }
   ],
   "require": {
-    "craftcms/cms": "^4.0.0"
+    "php": "^8.2",
+    "craftcms/cms": "^5.0.0"
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",
