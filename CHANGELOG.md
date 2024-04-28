@@ -11,6 +11,9 @@
 * PHPstan code cleanup
 * ECS code cleanup
 
+### Fixed
+* Fixed an issue where an exception would be thrown if `orderBy` was `null` ([#49](https://github.com/nystudio107/craft-similar/issues/49))
+
 ## 4.0.0 - 2022.05.09
 ### Added
 * Initial Craft CMS 4 release
