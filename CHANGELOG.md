@@ -11,6 +11,9 @@
 * PHPstan code cleanup
 * ECS code cleanup
 
+### Fixed
+* Fixed an issue where an exception would be thrown if `orderBy` was `null` ([#49](https://github.com/nystudio107/craft-similar/issues/49))
+
 ## 1.1.5 - 2021.06.03
 ### Changed
 * If `orderBy` criteria is omitted, entries are now sorted by the number of relations in common. (https://github.com/nystudio107/craft-similar/issues/35)
