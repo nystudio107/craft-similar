@@ -10,17 +10,15 @@
 
 namespace nystudio107\similar;
 
-use craft\base\Element;
-use nystudio107\similar\behaviors\CountBehavior;
-use nystudio107\similar\services\Similar as SimilarService;
-use nystudio107\similar\variables\SimilarVariable;
-
 use Craft;
+use craft\base\Element;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
 use craft\events\PopulateElementEvent;
 use craft\web\twig\variables\CraftVariable;
-
+use nystudio107\similar\behaviors\CountBehavior;
+use nystudio107\similar\services\ServicesTrait;
+use nystudio107\similar\variables\SimilarVariable;
 use yii\base\Event;
 
 /**
@@ -29,11 +27,14 @@ use yii\base\Event;
  * @author    nystudio107.com
  * @package   Similar
  * @since     1.0.0
- *
- * @property  SimilarService $similar
  */
 class Similar extends Plugin
 {
+    // Traits
+    // =========================================================================
+
+    use ServicesTrait;
+
     // Static Properties
     // =========================================================================
 
@@ -41,21 +42,6 @@ class Similar extends Plugin
      * @var Similar
      */
     public static $plugin;
-
-    // Static Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public function __construct($id, $parent = null, array $config = [])
-    {
-        $config['components'] = [
-            'similar' => SimilarService::class,
-        ];
-
-        parent::__construct($id, $parent, $config);
-    }
 
     // Public Properties
     // =========================================================================
@@ -89,7 +75,7 @@ class Similar extends Plugin
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            function (Event $event) {
+            function(Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('similar', SimilarVariable::class);
@@ -102,7 +88,7 @@ class Similar extends Plugin
                 $element = $event->element;
                 /** @var Element $element */
                 $element->attachBehavior('myCountBehavior', CountBehavior::class);
-        });
+            });
 
         Craft::info(
             Craft::t(
