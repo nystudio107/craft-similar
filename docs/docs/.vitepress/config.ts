@@ -3,7 +3,7 @@ import {defineConfig} from 'vitepress'
 export default defineConfig({
   title: 'Similar Plugin',
   description: 'Documentation for the Similar plugin',
-  base: '/docs/similar/v5/',
+  base: '/docs/similar/',
   lang: 'en-US',
   head: [
     ['meta', {content: 'https://github.com/nystudio107', property: 'og:see_also',}],
