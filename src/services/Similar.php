@@ -19,6 +19,7 @@ use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
+use craft\elements\db\OrderByPlaceholderExpression;
 use craft\events\CancelableEvent;
 use yii\base\Exception;
 use function is_array;
@@ -186,6 +187,7 @@ class Similar extends Component
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
         if (is_array($this->preOrder)) {
+            $this->preOrder = array_filter($this->preOrder, fn($value) => !$value instanceof OrderByPlaceholderExpression);
             $query->query->orderBy(array_merge([
                 'count' => 'DESC',
             ], $this->preOrder));
