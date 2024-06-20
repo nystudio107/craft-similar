@@ -1,5 +1,9 @@
 # Similar Changelog
 
+## 5.0.2 - 2024.06.20
+### Fixed
+* Fixed an issue where `toArray()` was done recursively on the passed in `$critera`, which turned objects into sub-arrays in `orderBy` and other properties, causing a DB error ([#51](https://github.com/nystudio107/craft-similar/issues/51)) ([#50](https://github.com/nystudio107/craft-similar/issues/50))
+
 ## 5.0.1 - 2024.06.19
 ### Fixed
 * Filter out `OrderByPlaceholderExpression` expressions from the `orderBy` clause in the `ElementQuery` to prevent invalid SQL from being generated ([#51](https://github.com/nystudio107/craft-similar/issues/51)) ([#52](https://github.com/nystudio107/craft-similar/issues/52))
