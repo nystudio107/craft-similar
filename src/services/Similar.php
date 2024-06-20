@@ -76,7 +76,7 @@ class Similar extends Component
 
         if (is_object($criteria)) {
             /** @var ElementQueryInterface $criteria */
-            $criteria = $criteria->toArray();
+            $criteria = $criteria->toArray([], [], false);
         }
 
         // Get an ElementQuery for this Element
