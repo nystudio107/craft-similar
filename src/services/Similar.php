@@ -182,7 +182,7 @@ class Similar extends Component
 
         if (empty($criteria['orderBy'])) {
             /** @phpstan-ignore-next-line */
-            // usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
+            usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
         }
 
         return $elements;
