@@ -1,5 +1,9 @@
 # Similar Changelog
 
+## 5.0.3 - UNRELEASED
+### Fixed
+* Fixed an issue where having empty elements or empty tags could cause an exception to be thrown, seemingly due to a change in Craft CMS ([#55](https://github.com/nystudio107/craft-similar/issues/55))
+
 ## 5.0.2 - 2024.06.20
 ### Fixed
 * Fixed an issue where `toArray()` was done recursively on the passed in `$critera`, which turned objects into sub-arrays in `orderBy` and other properties, causing a DB error ([#51](https://github.com/nystudio107/craft-similar/issues/51)) ([#50](https://github.com/nystudio107/craft-similar/issues/50))
