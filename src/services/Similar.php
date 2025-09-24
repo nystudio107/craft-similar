@@ -68,8 +68,7 @@ class Similar extends Component
         if (!isset($data['context'])) {
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
-
-
+        
         /** @var class-string|Element $element */
         $element = $data['element'];
         $context = $data['context'];
@@ -111,7 +110,7 @@ class Similar extends Component
         }
 
         // If no tags are provided, skip this and assume all elements are similar
-        if($tagIds){
+        if ($tagIds) {
             $query->andWhere(['in', 'relations.targetId', $tagIds]);
         }
 
@@ -142,7 +141,6 @@ class Similar extends Component
                 $similarCounts[$key] = $config['count'];
             }
         }
-
 
         if (empty($results)) {
             return [];
@@ -206,7 +204,7 @@ class Similar extends Component
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
         // If targetElements are provided, filter by them, otherwise get anything that matches criteria
-        if($this->targetElements){
+        if ($this->targetElements) {
             $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
         }
 
