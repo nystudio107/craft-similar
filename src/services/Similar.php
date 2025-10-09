@@ -68,7 +68,7 @@ class Similar extends Component
         if (!isset($data['context'])) {
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
-
+        
         /** @var class-string|Element $element */
         $element = $data['element'];
         $context = $data['context'];
@@ -109,10 +109,15 @@ class Similar extends Component
             $query->andWhere(['elements_sites.siteId' => $element->siteId]);
         }
 
-        $query->andWhere(['in', 'relations.targetId', $tagIds]);
+        // If no tags are provided, skip this and assume all elements are similar
+        if ($tagIds) {
+            $query->andWhere(['in', 'relations.targetId', $tagIds]);
+        }
+
         $query->leftJoin(['relations' => Table::RELATIONS], '[[elements.id]] = [[relations.sourceId]]');
 
         $results = $query->all();
+
 
         // Fetch the elements based on the returned `id` and `siteId`
         $queryConditions = [];
@@ -155,12 +160,13 @@ class Similar extends Component
                 $first = false;
                 $query->subQuery->$method(['and', [
                     'elements_sites.siteId' => $siteId,
-                    'elements.id' => $elementIds,],
+                    'elements.id' => $elementIds, ],
                 ]);
             }
         });
 
         $elements = $query->all();
+
 
         /** @var Element $element */
         foreach ($elements as $element) {
@@ -197,7 +203,10 @@ class Similar extends Component
 
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
-        $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
+        // If targetElements are provided, filter by them, otherwise get anything that matches criteria
+        if ($this->targetElements) {
+            $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
+        }
 
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
         $query->query->limit($this->limit); // or whatever limit is set
