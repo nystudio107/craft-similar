@@ -1,6 +1,6 @@
 # Similar Changelog
 
-## 5.0.3 - UNRELEASED
+## 5.0.3 - 2025.10.09
 ### Fixed
 * Fixed an issue where having empty elements or empty tags could cause an exception to be thrown, seemingly due to a change in Craft CMS ([#55](https://github.com/nystudio107/craft-similar/issues/55))
 
