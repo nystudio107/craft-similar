@@ -160,7 +160,7 @@ class Similar extends Component
                 $first = false;
                 $query->subQuery->$method(['and', [
                     'elements_sites.siteId' => $siteId,
-                    'elements.id' => $elementIds,],
+                    'elements.id' => $elementIds, ],
                 ]);
             }
         });
