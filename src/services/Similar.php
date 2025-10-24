@@ -68,7 +68,7 @@ class Similar extends Component
         if (!isset($data['context'])) {
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
-        
+
         /** @var class-string|Element $element */
         $element = $data['element'];
         $context = $data['context'];
@@ -81,12 +81,19 @@ class Similar extends Component
 
         // Get an ElementQuery for this Element
         $elementClass = is_object($element) ? $element::class : $element;
+
+        // Stash limit and remove from criteria
+        if (isset($criteria['limit'])) {
+            $this->limit = $criteria['limit'];
+            $criteria['limit'] = null;
+        }
+
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Stash any orderBy directives from the $query for our anonymous function
         $this->preOrder = $query->orderBy ?? [];
-        $this->limit = $query->limit;
+
         // Extract the $tagIds from the $context
         if (is_array($context)) {
             $tagIds = $context;
@@ -181,6 +188,9 @@ class Similar extends Component
         if (empty($criteria['orderBy'])) {
             /** @phpstan-ignore-next-line */
             usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
+        }
+        if ($this->limit) {
+            $elements = array_slice($elements, 0, $this->limit);
         }
 
         return $elements;
