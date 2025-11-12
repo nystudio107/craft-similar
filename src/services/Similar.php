@@ -80,12 +80,18 @@ class Similar extends Component
 
         // Get an ElementQuery for this Element
         $elementClass = is_object($element) ? $element::class : $element;
+
+        // Stash limit and remove from criteria
+        if (isset($criteria['limit'])) {
+            $this->limit = $criteria['limit'];
+            $criteria['limit'] = null;
+        }
+
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Stash any orderBy directives from the $query for our anonymous function
         $this->preOrder = $query->orderBy ?? [];
-        $this->limit = $query->limit;
         // Extract the $tagIds from the $context
         if (is_array($context)) {
             $tagIds = $context;
@@ -157,7 +163,7 @@ class Similar extends Component
                 $first = false;
                 $query->subQuery->$method(['and', [
                     'elements_sites.siteId' => $siteId,
-                    'elements.id' => $elementIds, ],
+                    'elements.id' => $elementIds,],
                 ]);
             }
         });
@@ -177,6 +183,9 @@ class Similar extends Component
         if (empty($criteria['orderBy'])) {
             /** @phpstan-ignore-next-line */
             usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
+        }
+        if ($this->limit) {
+            $elements = array_slice($elements, 0, $this->limit);
         }
 
         return $elements;
@@ -204,7 +213,6 @@ class Similar extends Component
         }
 
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
-        $query->query->limit($this->limit); // or whatever limit is set
 
         $query->subQuery->groupBy(['elements.id', 'content.id', 'elements_sites.id']);
 
