@@ -82,10 +82,27 @@ class Similar extends Component
         // Get an ElementQuery for this Element
         $elementClass = is_object($element) ? $element::class : $element;
 
-        // Stash limit and remove from criteria
+        // Stash limit for later
         if (isset($criteria['limit'])) {
             $this->limit = $criteria['limit'];
-            $criteria['limit'] = null;
+        }
+
+        // The 'similarity' criterion can be used to 'tune' the balance between
+        // relevance (count of shared relationships) and recency (age of entries).
+        // Higher values prioritize relevant entries, with poorer performance.
+        // Lower values prioritize more recent entries, with faster performance.
+
+        // Tuning suggestions:
+        // - experiment with values between 1 and limit x 10
+        // - set 'similarity' to 0 (unlimited) to maximize relevance
+        // - omit the 'similarity' criterion to maximize recency
+        if (isset($criteria['similarity'])) {
+            if ($criteria['similarity'] === 0) {
+                $criteria['limit'] = null; // unlimited
+            } elseif ($criteria['similarity'] > $this->limit) {
+                $criteria['limit'] = $criteria['similarity'];
+            }
+            unset($criteria['similarity']);
         }
 
         /** @var EntryQuery $query */
