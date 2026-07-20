@@ -68,7 +68,7 @@ class Similar extends Component
         if (!isset($data['context'])) {
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
-        
+
         /** @var class-string|Element $element */
         $element = $data['element'];
         $context = $data['context'];
@@ -192,15 +192,7 @@ class Similar extends Component
         $query = $event->sender;
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
-        if (is_array($this->preOrder)) {
-            $this->preOrder = array_filter($this->preOrder, fn($value) => !$value instanceof OrderByPlaceholderExpression);
-            $query->query->orderBy(array_merge([
-                'count' => 'DESC',
-            ], $this->preOrder));
-        } elseif (is_string($this->preOrder)) {
-            $query->query->orderBy('count DESC, ' . str_replace('`', '', $this->preOrder));
-        }
-
+        $query->query->orderBy(array_merge(['count' => SORT_DESC], $query->query->orderBy ?? []));
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
         // If targetElements are provided, filter by them, otherwise get anything that matches criteria
