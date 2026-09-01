@@ -19,7 +19,6 @@ use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
-use craft\elements\db\OrderByPlaceholderExpression;
 use craft\events\CancelableEvent;
 use yii\base\Exception;
 use function is_array;
