@@ -81,19 +81,12 @@ class Similar extends Component
 
         // Get an ElementQuery for this Element
         $elementClass = is_object($element) ? $element::class : $element;
-
-        // Stash limit and remove from criteria
-        if (isset($criteria['limit'])) {
-            $this->limit = $criteria['limit'];
-            $criteria['limit'] = null;
-        }
-
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Stash any orderBy directives from the $query for our anonymous function
         $this->preOrder = $query->orderBy ?? [];
-
+        $this->limit = $query->limit;
         // Extract the $tagIds from the $context
         if (is_array($context)) {
             $tagIds = $context;
@@ -189,9 +182,6 @@ class Similar extends Component
             /** @phpstan-ignore-next-line */
             usort($elements, static fn($a, $b) => $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1));
         }
-        if ($this->limit) {
-            $elements = array_slice($elements, 0, $this->limit);
-        }
 
         return $elements;
     }
@@ -202,15 +192,7 @@ class Similar extends Component
         $query = $event->sender;
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
-        if (is_array($this->preOrder)) {
-            $this->preOrder = array_filter($this->preOrder, fn($value) => !$value instanceof OrderByPlaceholderExpression);
-            $query->query->orderBy(array_merge([
-                'count' => 'DESC',
-            ], $this->preOrder));
-        } elseif (is_string($this->preOrder)) {
-            $query->query->orderBy('count DESC, ' . str_replace('`', '', $this->preOrder));
-        }
-
+        $query->query->orderBy(array_merge(['count' => SORT_DESC], $query->query->orderBy ?? []));
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
         // If targetElements are provided, filter by them, otherwise get anything that matches criteria
@@ -219,6 +201,7 @@ class Similar extends Component
         }
 
         $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
+        $query->query->limit($this->limit); // or whatever limit is set
 
         $query->subQuery->groupBy(['elements.id', 'elements_sites.id']);
 
