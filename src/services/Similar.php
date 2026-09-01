@@ -38,28 +38,28 @@ class Similar extends Component
     /**
      * @var string|array The previous order in the query
      */
-    public $preOrder;
+    public $preOrder = [];
 
     /**
-     * @var int
+     * @var ?int
      */
-    public $limit;
+    public $limit = null;
 
     /**
      * @var Element[]
      */
-    public $targetElements;
+    public $targetElements = [];
 
     // Public Methods
     // =========================================================================
 
     /**
-     * @param $data
+     * @param array $data
      *
-     * @return mixed
+     * @return array|ElementInterface
      * @throws Exception
      */
-    public function find($data)
+    public function find(array $data)
     {
         if (!isset($data['element'])) {
             throw new Exception('Required parameter `element` was not supplied to `craft.similar.find`.');
@@ -69,7 +69,7 @@ class Similar extends Component
             throw new Exception('Required parameter `context` was not supplied to `craft.similar.find`.');
         }
 
-        /** @var Element|class-string $element */
+        /** @var class-string|Element $element */
         $element = $data['element'];
         $context = $data['context'];
         $criteria = $data['criteria'] ?? [];
@@ -81,19 +81,12 @@ class Similar extends Component
 
         // Get an ElementQuery for this Element
         $elementClass = is_object($element) ? get_class($element) : $element;
-
-        // Stash limit and remove from criteria
-        if (isset($criteria['limit'])) {
-            $this->limit = $criteria['limit'];
-            $criteria['limit'] = null;
-        }
-
         /** @var EntryQuery $query */
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Stash any orderBy directives from the $query for our anonymous function
         $this->preOrder = $query->orderBy ?? [];
-
+        $this->limit = $query->limit;
         // Extract the $tagIds from the $context
         if (is_array($context)) {
             $tagIds = $context;
@@ -101,6 +94,7 @@ class Similar extends Component
             /** @var ElementQueryInterface $context */
             $tagIds = $context->ids();
         }
+
         $this->targetElements = $tagIds;
 
         // We need to modify the actual craft\db\Query after the ElementQuery has been prepared
@@ -108,7 +102,7 @@ class Similar extends Component
         // Return the data as an array, and only fetch the `id` and `siteId`
         $query->asArray(true);
         $query->select(['elements.id', 'elements_sites.siteId']);
-        $query->andWhere(['not', ['elements.id' => $element->id]]);
+        $query->andWhere(['not', ['elements.id' => $element->getId()]]);
 
         // Unless site criteria is provided, force the element's site.
         if (empty($criteria['siteId']) && empty($criteria['site'])) {
@@ -119,13 +113,13 @@ class Similar extends Component
         if ($tagIds) {
             $query->andWhere(['in', 'relations.targetId', $tagIds]);
         }
+
         $query->leftJoin(['relations' => Table::RELATIONS], '[[elements.id]] = [[relations.sourceId]]');
+
         $results = $query->all();
 
-        // Fetch the elements based on the returned `id` and `siteId`
-        $elements = Craft::$app->getElements();
-        $models = [];
 
+        // Fetch the elements based on the returned `id` and `siteId`
         $queryConditions = [];
         $similarCounts = [];
 
@@ -156,7 +150,7 @@ class Similar extends Component
         $query = $this->getElementQuery($elementClass, $criteria);
 
         // Make sure we fetch the elements that are similar only
-        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function(CancelableEvent $event) use ($queryConditions) {
+        $query->on(ElementQuery::EVENT_AFTER_PREPARE, function(CancelableEvent $event) use ($queryConditions): void {
             /** @var ElementQuery $query */
             $query = $event->sender;
             $first = true;
@@ -173,6 +167,7 @@ class Similar extends Component
 
         $elements = $query->all();
 
+
         /** @var Element $element */
         foreach ($elements as $element) {
             // The `count` property is added dynamically by our CountBehavior behavior
@@ -183,47 +178,34 @@ class Similar extends Component
             }
         }
 
-        if (empty($data['criteria']['orderBy'])) {
+        if (empty($criteria['orderBy'])) {
             usort($elements, function($a, $b) {
                 /** @phpstan-ignore-next-line */
                 return $a->count < $b->count ? 1 : ($a->count == $b->count ? 0 : -1);
             });
         }
-        if ($this->limit) {
-            $elements = array_slice($elements, 0, $this->limit);
-        }
 
         return $elements;
     }
 
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * @param CancelableEvent $event
-     */
-    protected function eventAfterPrepareHandler(CancelableEvent $event)
+    protected function eventAfterPrepareHandler(CancelableEvent $event): void
     {
         /** @var ElementQuery $query */
         $query = $event->sender;
         // Add in the `count` param so we know how many were fetched
         $query->query->addSelect(['COUNT(*) as count']);
-        if (is_array($this->preOrder)) {
-            $query->query->orderBy(array_merge([
-                'count' => 'DESC',
-            ], $this->preOrder));
-        } elseif (is_string($this->preOrder)) {
-            $query->query->orderBy('count DESC, ' . str_replace('`', '', $this->preOrder));
-        }
+        $query->query->orderBy(array_merge(['count' => SORT_DESC], $query->query->orderBy ?? []));
         $query->query->groupBy(['relations.sourceId', 'elements.id', 'elements_sites.siteId']);
 
         // If targetElements are provided, filter by them, otherwise get anything that matches criteria
         if ($this->targetElements) {
             $query->query->andWhere(['in', 'relations.targetId', $this->targetElements]);
         }
-        $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
 
-        $query->subQuery->groupBy(['elements.id', 'content.id', 'elements_sites.id']);
+        $query->subQuery->limit(null); // inner limit to null -> fetch all possible entries, sort them afterwards
+        $query->query->limit($this->limit); // or whatever limit is set
+
+        $query->subQuery->groupBy(['elements.id', 'elements_sites.id']);
 
         if ($query instanceof EntryQuery) {
             $query->subQuery->addGroupBy(['entries.postDate']);
@@ -232,13 +214,14 @@ class Similar extends Component
         if ($query->withStructure || ($query->withStructure !== false && $query->structureId)) {
             $query->subQuery->addGroupBy(['structureelements.structureId', 'structureelements.lft']);
         }
+
         $event->isValid = true;
     }
 
     /**
      * Returns the element query based on $elementType and $criteria
      *
-     * @param class-string|ElementInterface $elementType
+     * @param string|ElementInterface $elementType
      * @param array $criteria
      * @return ElementQueryInterface
      */
