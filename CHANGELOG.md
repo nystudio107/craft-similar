@@ -3,6 +3,7 @@
 ## 1.1.9 - UNRELEASED
 ### Fixed
 * Fix `limit` being added to the element query *before* it has been sorted by `count`, fixes #57 ([#58](https://github.com/nystudio107/craft-similar/pull/58))
+* Redo limit and orderBy via ([#63](https://github.com/nystudio107/craft-similar/pull/63))
 
 ## 1.1.8 - 2025.10.09
 ### Fixed
